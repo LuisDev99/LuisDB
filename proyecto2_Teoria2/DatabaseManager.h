@@ -10,13 +10,17 @@
 
 struct DatabaseMetadata {
 
-	int databaseSize, cantidadBloques;
+	int databaseSize, cantidadBloques, dataBlockSize;
 
-	DatabaseMetadata(int _databaseSize) {
+	DatabaseMetadata(int _databaseSize, int _dataBlockSize) {
 
 		databaseSize = _databaseSize * MegaBytesInBytesSize; //Convert it to Bytes
 		cantidadBloques = databaseSize / DataBlockSize; // Calculate the amount of block
+		dataBlockSize = _dataBlockSize;
+
 	}
+
+	DatabaseMetadata(){ }
 
 };
 

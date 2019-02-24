@@ -22,7 +22,7 @@ bool DatabaseManager::createTable()
 
 bool DatabaseManager::createDatabase()
 {
-	string databaseName;
+	string databaseName, path;
 	int datablockSize;
 	int databaseSize;
 
@@ -30,6 +30,7 @@ bool DatabaseManager::createDatabase()
 
 	cout << "Ingrese el nombre de la base de dato: ";
 	cin >> databaseName;
+	path = databaseName;
 
 	cout << "Ingrese el tamaño (MB): ";
 	cin >> databaseSize;
@@ -66,19 +67,36 @@ bool DatabaseManager::createDatabase()
 
 	}
 	
-
-	_mkdir(databaseName.c_str());
+	path = "Databases//" + databaseName;
+	_mkdir(path.c_str());
 	
-	string pathToDatabaseDirectory = databaseName + "//" + databaseName + ".db";
+	string pathToDatabaseDirectory = path + "//" + databaseName + ".dbb";
 
-	fstream writer(pathToDatabaseDirectory.c_str(), ios::binary);
+	fstream writer(pathToDatabaseDirectory.c_str(), ios::out | ios::binary);
 
-	DatabaseMetadata dbMetadata(databaseSize);
+	DatabaseMetadata dbMetadata(databaseSize, datablockSize);
 	
+	/*First 12 bytes for the metadata of the db*/
+	writer.write(reinterpret_cast<char *>(&dbMetadata), sizeof DatabaseMetadata);
 
+	/*Next, the map of bytes which will help to find an empty block, create them with all and set it to true*/
 
+	bool dummyBool = true;
+	for (int i = 0; i < dbMetadata.cantidadBloques; i++) {
+		writer.write(reinterpret_cast<char *>(&dummyBool), sizeof(bool));
+	}
 
-	return false;
+	/*The rest, write the empty blocks*/
+	Bloque block(dbMetadata.dataBlockSize);
+
+	for (int i = 0; i < dbMetadata.cantidadBloques; i++) {
+		writer.write(reinterpret_cast<char *>(&block), sizeof block);
+	}
+
+	cout << "Database Created\n ";
+	system("pause");
+
+	return true;
 }
 
 bool DatabaseManager::dropDatabase()
@@ -110,3 +128,28 @@ bool DatabaseManager::update()
 {
 	return false;
 }
+
+
+//TEEST
+/*fstream reader(pathToDatabaseDirectory.c_str(), ios::in | ios::binary);
+DatabaseMetadata mFresh;
+
+reader.seekg(0, ios::beg);
+
+reader.read(reinterpret_cast<char *>(&mFresh), sizeof(DatabaseMetadata));
+
+cout << mFresh.databaseSize << "-> " << mFresh.dataBlockSize << "--> " << mFresh.cantidadBloques;
+
+//For the boolean vector
+
+bool  erick;
+fstream reader(pathToDatabaseDirectory.c_str(), ios::in | ios::binary);
+
+reader.seekg(12, ios::beg);
+
+for (int i = 0; i < dbMetadata.cantidadBloques; i++) {
+reader.read(reinterpret_cast<char *>(&erick), sizeof(bool));
+cout << erick;
+}
+
+system("pause");*/
