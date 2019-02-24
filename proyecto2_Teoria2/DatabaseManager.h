@@ -23,7 +23,7 @@ struct DatabaseMetadata {
 struct Bloque {
 
 	/* Primeros 105 bytes para la metadata del bloque (cada bloque actuara como tabla)
-	 * cuando un bloque se llene escribir la misma metadata al bloque siguiente **/
+	 * cuando un bloque se llene escribir la misma metadata al bloque siguiente ***/
 
 	Bloque(int datablocksize, int _registerSize) {
 		Data = new char[datablocksize - DataBlockMetadataSize];
